@@ -9,7 +9,7 @@ pub fn part1() -> String {
     let mut left_list: Vec<i32> = Vec::with_capacity(lines_length);
     let mut right_list: Vec<i32> = Vec::with_capacity(lines_length);
     for line in lines {
-        let numbers = line.split("   ").collect::<Vec<&str>>();
+        let numbers = line.split_whitespace().collect::<Vec<&str>>();
         let left_num = numbers[0].parse::<i32>().expect("Couldnt parse number");
         let right_num = numbers[1].parse::<i32>().expect("Couldnt parse number");
 
@@ -19,11 +19,11 @@ pub fn part1() -> String {
     left_list.sort_unstable();
     right_list.sort_unstable();
 
-    let mut total_error = 0i32;
+    let mut total_error = 0u32;
     for num in 0..lines_length {
-        total_error += (left_list[num] - right_list[num]).abs();
+        total_error += left_list[num].abs_diff(right_list[num]);
     }
-    
+
     total_error.to_string()
 }
 
@@ -36,7 +36,7 @@ pub fn part2() -> String {
     let mut left_list: Vec<i32> = Vec::with_capacity(lines_length);
     let mut right_map: HashMap<i32, i32> = HashMap::new();
     for line in lines {
-        let numbers = line.split("   ").collect::<Vec<&str>>();
+        let numbers = line.split_whitespace().collect::<Vec<&str>>();
         let left_num = numbers[0].parse::<i32>().expect("Couldnt parse number");
         let right_num = numbers[1].parse::<i32>().expect("Couldnt parse number");
 
