@@ -6,36 +6,36 @@ fn are_levels_ordered(prev: i32, next: i32) -> bool {
 }
 
 fn is_report_ordered(levels: &Vec<i32>) -> bool {
-    let mut is_increasing = true;
-    let mut is_decreasing = true;
+    let mut is_ordered = true;
     let mut last_level = levels[0];
     for l in 1..levels.len() {
-        is_increasing = is_increasing && are_levels_ordered(last_level, levels[l]);
-        is_decreasing = is_decreasing && are_levels_ordered(levels[l], last_level);
-
+        is_ordered = is_ordered && are_levels_ordered(last_level, levels[l]);
         last_level = levels[l];
     }
-
-    is_increasing || is_decreasing
+    is_ordered
 }
 
-fn is_report_almost_ordered(levels: &Vec<i32>) -> bool {
-    let mut is_increasing = true;
+fn is_report_safe(levels: &mut Vec<i32>) -> bool {
+    is_report_ordered(levels) || is_report_ordered({ levels.reverse(); &levels })
+}
+
+fn is_dampened_report_ordered(levels: &mut Vec<i32>) -> bool {
+    let mut is_almost_ordered = true;
     let mut last_level = levels[0];
     for l in 1..levels.len() {
-        is_increasing = is_increasing && are_levels_ordered(last_level, levels[l]);
+        is_almost_ordered = is_almost_ordered && are_levels_ordered(last_level, levels[l]);
 
-        if is_increasing {
+        if is_almost_ordered {
             last_level = levels[l];
         }
         else {
             let mut potential_solution1 = levels.clone();
             potential_solution1.remove(l-1);
-            let potential_solved1 = is_report_ordered(&potential_solution1);
+            let potential_solved1 = is_report_ordered(&mut potential_solution1);
 
             let mut potential_solution2 = levels.clone();
             potential_solution2.remove(l);
-            let potential_solved2 = is_report_ordered(&potential_solution2);
+            let potential_solved2 = is_report_ordered(&mut potential_solution2);
 
             if potential_solved1 || potential_solved2 {
                 return true;
@@ -45,34 +45,11 @@ fn is_report_almost_ordered(levels: &Vec<i32>) -> bool {
             }
         }
     }
+    is_almost_ordered
+}
 
-    let mut is_decreasing = true;
-    let mut last_level = levels[0];
-    for l in 1..levels.len() {
-        is_decreasing = is_decreasing && are_levels_ordered(levels[l], last_level);
-
-        if is_decreasing {
-            last_level = levels[l];
-        }
-        else {
-            let mut potential_solution1 = levels.clone();
-            potential_solution1.remove(l-1);
-            let potential_solved1 = is_report_ordered(&potential_solution1);
-
-            let mut potential_solution2 = levels.clone();
-            potential_solution2.remove(l);
-            let potential_solved2 = is_report_ordered(&potential_solution2);
-
-            if potential_solved1 || potential_solved2 {
-                return true;
-            }
-            else {
-                break;
-            }
-        }
-    }
-
-    is_increasing || is_decreasing
+fn is_dampened_report_safe(levels: &mut Vec<i32>) -> bool {
+    is_dampened_report_ordered(levels) || is_dampened_report_ordered({ levels.reverse(); levels })
 }
 
 #[allow(dead_code)]
@@ -82,8 +59,8 @@ pub fn part1() -> String {
     let reports = aoc::to_lines("input/day2.txt");
     for report in reports {
         let levels = report.split_whitespace().collect::<Vec<&str>>();
-        let levels = levels.iter().map(|s| s.parse::<i32>().unwrap()).collect::<Vec<i32>>();
-        if is_report_ordered(&levels) {
+        let mut levels = levels.iter().map(|s| s.parse::<i32>().unwrap()).collect::<Vec<i32>>();
+        if is_report_safe(&mut levels) {
             safe_reports += 1;
         }
     }
@@ -98,8 +75,8 @@ pub fn part2() -> String {
     let reports = aoc::to_lines("input/day2.txt");
     for report in reports {
         let levels = report.split_whitespace().collect::<Vec<&str>>();
-        let levels = levels.iter().map(|s| s.parse::<i32>().unwrap()).collect::<Vec<i32>>();
-        if is_report_almost_ordered(&levels) {
+        let mut levels = levels.iter().map(|s| s.parse::<i32>().unwrap()).collect::<Vec<i32>>();
+        if is_dampened_report_safe(&mut levels) {
             safe_reports += 1;
         }
     }
