@@ -2,8 +2,7 @@ use std::collections::HashMap;
 
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let lines = aoc::to_lines("input/day1.txt")
-    .expect("Error reading file");
+    let lines = aoc::to_lines("input/day1.txt");
     let lines_length = lines.len();
 
     let mut left_list: Vec<i32> = Vec::with_capacity(lines_length);
@@ -29,8 +28,7 @@ pub fn part1() -> String {
 
 #[allow(dead_code)]
 pub fn part2() -> String {
-    let lines = aoc::to_lines("input/day1.txt")
-    .expect("Error reading file");
+    let lines = aoc::to_lines("input/day1.txt");
     let lines_length = lines.len();
 
     let mut left_list: Vec<i32> = Vec::with_capacity(lines_length);
