@@ -101,7 +101,6 @@ pub fn part2() -> String {
         let levels = levels.iter().map(|s| s.parse::<i32>().unwrap()).collect::<Vec<i32>>();
         if is_report_almost_ordered(&levels) {
             safe_reports += 1;
-            println!("{:?}", report);
         }
     }
 
