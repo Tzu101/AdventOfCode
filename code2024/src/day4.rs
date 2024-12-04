@@ -112,8 +112,58 @@ pub fn part1() -> String {
     find_all_xmas(puzzle).to_string()
 }
 
+fn puzzle_at(puzzle: &Vec<Vec<char>>, position: &Position) -> char {
+    puzzle[position.row][position.col]
+}
+
+fn is_mas_x_mas(puzzle: &Vec<Vec<char>>, position: &Position) -> bool {
+    let top_left = puzzle_at(puzzle, &(position + Direction::UP_LEFT));
+    let top_right = puzzle_at(puzzle, &(position + Direction::UP_RIGHT));
+    let bottom_left = puzzle_at(puzzle, &(position + Direction::DOWN_LEFT));
+    let bottom_right = puzzle_at(puzzle, &(position + Direction::DOWN_RIGHT));
+
+    let ms_and_ss = (top_left == 'M' || top_left == 'S') && (top_left != bottom_right);
+
+    if (top_left == top_right) && ms_and_ss &&
+        (bottom_left == bottom_right) && (bottom_left == 'M' || bottom_right == 'S') {
+        return true;
+    }
+
+    if (top_left == bottom_left) && ms_and_ss &&
+        (top_right == bottom_right) && (top_right == 'M' || bottom_right == 'S') {
+        return true;
+    }
+
+    false
+}
+
+fn print_max_x_max(puzzle: &Vec<Vec<char>>, position: &Position) {
+    let top_left = puzzle_at(puzzle, &(position + Direction::UP_LEFT));
+    let top_right = puzzle_at(puzzle, &(position + Direction::UP_RIGHT));
+    let bottom_left = puzzle_at(puzzle, &(position + Direction::DOWN_LEFT));
+    let bottom_right = puzzle_at(puzzle, &(position + Direction::DOWN_RIGHT));
+
+    println!();
+    println!("{} . {}", top_left, top_right);
+    println!(". {} .", puzzle_at(puzzle, position));
+    println!("{} . {}", bottom_left, bottom_right);
+}
+
 #[allow(dead_code)]
 pub fn part2() -> String {
-    //let memory = &aoc::to_string("input/day4_example.txt");
-    String::from("2")
+    let mut mas_x_mas = 0;
+    let puzzle = &aoc::to_char("input/day4.txt");
+    for row in 1..puzzle.len()-1 {
+        for col in 1..puzzle[row].len()-1 {
+            let letter = puzzle[row][col];
+            if !(letter == 'A') {
+                continue;
+            }
+            if is_mas_x_mas(puzzle, &Position{row, col}) {
+                //print_max_x_max(puzzle, &Position{row, col});
+                mas_x_mas += 1;
+            }
+        }
+    }
+    mas_x_mas.to_string()
 }
