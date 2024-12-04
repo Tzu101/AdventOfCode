@@ -13,6 +13,16 @@ pub fn to_string(file_path: &str) -> String {
     content
 }
 
+pub fn to_char(file_path: &str) -> Vec<Vec<char>> {
+    let file = File::open(file_path).unwrap();
+    let reader = BufReader::new(file);
+    let mut bytes: Vec<Vec<char>> = Vec::new();
+    for line in reader.lines() {
+        bytes.push(line.unwrap().chars().collect());
+    }
+    bytes
+}
+
 pub fn benchmark<F, R>(func: F) -> R
 where
     F: FnOnce() -> R,
