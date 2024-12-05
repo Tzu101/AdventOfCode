@@ -83,7 +83,7 @@ fn find_xmas(puzzle: &Vec<Vec<char>>, position: Position, direction: &Direction,
 }
 
 fn position_in_puzzle(puzzle: &Vec<Vec<char>>, position: Position) -> bool {
-    0 <= position.row && position.row < puzzle.len() && 0 <= position.col && position.col < puzzle[0].len()
+    position.row < puzzle.len() && position.col < puzzle[0].len()
 }
 
 fn find_all_xmas(puzzle: &Vec<Vec<char>>) -> u32 {
@@ -137,18 +137,6 @@ fn is_mas_x_mas(puzzle: &Vec<Vec<char>>, position: &Position) -> bool {
     false
 }
 
-fn print_max_x_max(puzzle: &Vec<Vec<char>>, position: &Position) {
-    let top_left = puzzle_at(puzzle, &(position + Direction::UP_LEFT));
-    let top_right = puzzle_at(puzzle, &(position + Direction::UP_RIGHT));
-    let bottom_left = puzzle_at(puzzle, &(position + Direction::DOWN_LEFT));
-    let bottom_right = puzzle_at(puzzle, &(position + Direction::DOWN_RIGHT));
-
-    println!();
-    println!("{} . {}", top_left, top_right);
-    println!(". {} .", puzzle_at(puzzle, position));
-    println!("{} . {}", bottom_left, bottom_right);
-}
-
 #[allow(dead_code)]
 pub fn part2() -> String {
     let mut mas_x_mas = 0;
@@ -160,7 +148,6 @@ pub fn part2() -> String {
                 continue;
             }
             if is_mas_x_mas(puzzle, &Position{row, col}) {
-                //print_max_x_max(puzzle, &Position{row, col});
                 mas_x_mas += 1;
             }
         }
