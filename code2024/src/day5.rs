@@ -82,8 +82,8 @@ pub fn part2() -> String {
                 }
                 Rules::Breaks(first, second) => {
                     already_follows = false;
-                    let breaks_rules = example.remove(second);
-                    example.insert(first, breaks_rules);
+                    let breaks_rules = example.remove(first);
+                    example.insert(second, breaks_rules);
                 }
             }
         }
