@@ -153,8 +153,8 @@ fn does_guard_loop(map: &Vec<Vec<i32>>, position: &Position, direction: &Directi
 
 #[allow(dead_code)]
 pub fn part2() -> String {
-    let mut guard_facing = Direction::Up;
-    let (mut guard_position, mut guard_map) = get_guard();
+    let guard_facing = Direction::Up;
+    let (guard_position, mut guard_map) = get_guard();
 
     let mut unique_obstacles = 0;
     for row in 0..guard_map.len() {
@@ -171,32 +171,4 @@ pub fn part2() -> String {
         }
     }
     unique_obstacles.to_string()
-
-    /*let mut unique_obstacles = vec![0u32; guard_map.len() * guard_map[0].len()];
-    while is_position_in_map(&guard_position, &guard_map) {
-        let next_position = get_next_position(&guard_position, &guard_facing);
-
-        // Simulate with extra obstacle
-        if is_position_in_map(&next_position, &guard_map) && guard_map[next_position.y as usize][next_position.x as usize] != 1 {
-            guard_map[next_position.y as usize][next_position.x as usize] = 1;
-            if does_guard_loop(&guard_map, &guard_position, &guard_facing) {
-                let unique_index = (next_position.y * (guard_map[0].len() as i32) + next_position.x) as usize;
-                unique_obstacles[unique_index] = 1;
-            }
-            else {
-            }
-            guard_map[next_position.y as usize][next_position.x as usize] = 0;
-        }
-        else {
-        }
-
-        if is_obstacle(&next_position, &guard_map) {
-            flip_guard(&mut guard_facing);
-        }
-        else {
-            guard_position = next_position;
-        }
-    }
-
-    unique_obstacles.iter().sum::<u32>().to_string()*/
 }
