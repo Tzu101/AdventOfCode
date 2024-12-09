@@ -39,6 +39,7 @@ pub fn part1() -> String {
         .to_string()
 }
 
+#[allow(dead_code)]
 pub fn part2() -> String {
     let antenna_map = aoc::to_char("input/day8.txt");
     let mut anti_antenna_map = antenna_map.clone();
