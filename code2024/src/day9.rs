@@ -63,7 +63,133 @@ pub fn part1() -> String {
     checksum.to_string()
 }
 
+#[derive(Clone)]
+#[derive(Debug)]
+enum Block {
+    Empty(usize),
+    File(usize, u64),
+}
+
+fn find_suitable_empty_block(blocks: &Vec::<Block>, size: usize) -> Option<usize> {
+    for i in 0..blocks.len() {
+        if let Block::Empty(empty_size) = blocks.get(i).unwrap() {
+            if *empty_size >= size {
+                return Some(i);
+            }
+        }
+    }
+    None
+}
+
+fn find_next_file_block(blocks: &Vec::<Block>, start: usize) -> usize {
+    for i in (0..start).rev() {
+        if let Block::File(_, _) = blocks.get(i).unwrap() {
+            return i;
+        }
+    }
+    0
+}
+
 #[allow(dead_code)]
 pub fn part2() -> String {
-    String::from("2")
+    let disk = aoc::to_char("input/day9.txt");
+    let disk = &disk[0];
+    //println!("{:?}", disk);
+
+    let mut blocks = Vec::<Block>::new();
+    for f in 0..disk.len() {
+        let block_size = disk[f].to_digit(10).unwrap() as usize;
+        let mut block_id = Block::Empty(block_size);
+        if f % 2 == 0 {
+            block_id = Block::File(block_size, (f / 2) as u64);
+        }
+
+        blocks.push(block_id);
+    }
+    /*println!("{:?}", blocks.iter().map(|b| {
+        return match b {
+            Block::Empty(size) => {
+                format!("Empty({})", size)
+            }
+            Block::File(size, id) => {
+                format!("File({size}, {id})")
+            }
+        }
+    }).collect::<Vec<String>>());*/
+
+    let mut move_from = blocks.len() - 1;
+    while move_from > 0 {
+        let file_size: usize;
+        let file_block = &blocks[move_from];
+        if let Block::File(file_block_size, ..) = file_block {
+            file_size = file_block_size.clone();
+        }
+        else {
+            panic!("File block is not a file");
+        }
+
+        let move_to = find_suitable_empty_block(&blocks, file_size);
+        if move_to.is_none() {
+            move_from = find_next_file_block(&blocks, move_from);
+            continue;
+        }
+        let move_to = move_to.unwrap();
+        if (move_to >= move_from) {
+            move_from = find_next_file_block(&blocks, move_from);
+            continue;
+        }
+
+        let empty_size: usize;
+        let empty_block = &blocks[move_to];
+        if let Block::Empty(empty_block_size) = empty_block {
+            empty_size = empty_block_size.clone();
+        }
+        else {
+            panic!("Empty block is not empty");
+        }
+
+        println!("Move {:?} from {} to {}", file_block, move_from, move_to);
+        if file_size == empty_size {
+            let temp_block = file_block.clone();
+            blocks[move_from] = empty_block.clone();
+            blocks[move_to] = temp_block;
+            println!("MOVING");
+        }
+        else if file_size < empty_size {
+            let temp_block = file_block.clone();
+            blocks[move_from] = Block::Empty(file_size);
+            blocks[move_to] = temp_block;
+            blocks.insert(move_to + 1, Block::Empty(empty_size - file_size));
+            println!("FRAGMENTING");
+        }
+        move_from = find_next_file_block(&blocks, move_from);
+
+        /*println!("{:?}", blocks.iter().map(|b| {
+            return match b {
+                Block::Empty(size) => {
+                    format!("Empty({})", size)
+                }
+                Block::File(size, id) => {
+                    format!("File({size}, {id})")
+                }
+            }
+        }).collect::<Vec<String>>());*/
+    }
+
+    let mut checksum: u64 = 0;
+    let mut total_ids: u64 = 0;
+    for block in blocks {
+        match block {
+            Block::Empty(size) => {
+                total_ids += size as u64;
+            }
+            Block::File(size, id) => {
+                for _ in 0..size {
+                    checksum += total_ids * id;
+                    total_ids += 1;
+                }
+            }
+        }
+    }
+    checksum.to_string()
 }
