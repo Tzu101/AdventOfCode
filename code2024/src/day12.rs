@@ -1,0 +1,190 @@
+use std::collections::HashSet;
+const NO_PLANT: char = '#';
+
+fn find_region(origin: (usize, usize), garden: &mut Vec<Vec<char>>, plot: &mut Vec<Option<(usize, usize)>>) {
+    let plant = garden[origin.0][origin.1];
+    garden[origin.0][origin.1] = NO_PLANT;
+    plot[origin.0 * garden[origin.0].len() + origin.1] = Some(origin);
+
+    if origin.0 > 0 && plant == garden[origin.0 - 1][origin.1] {
+        find_region((origin.0 - 1, origin.1), garden, plot);
+    }
+    if origin.0 < garden.len() - 1 && plant == garden[origin.0 + 1][origin.1] {
+        find_region((origin.0 + 1, origin.1), garden, plot);
+    }
+    if origin.1 > 0 && plant == garden[origin.0][origin.1 - 1] {
+        find_region((origin.0, origin.1 - 1), garden, plot);
+    }
+    if origin.1 < garden[origin.0].len() - 1 && plant == garden[origin.0][origin.1 + 1] {
+        find_region((origin.0, origin.1 + 1), garden, plot);
+    }
+}
+
+fn plot_area(plot: &Vec<Option<(usize, usize)>>) -> u32 {
+    plot.iter().filter(|&x| x.is_some()).count() as u32
+}
+
+fn plot_perimeter(plot: &Vec<Option<(usize, usize)>>, height: usize, width: usize) -> u32 {
+    let mut perimeter = 0;
+    for plant in plot {
+        if let Some((row, col)) = plant {
+            if *row == 0 {
+                perimeter += 1;
+            }
+            else {
+                if plot[(row - 1) * width + col].is_none() {
+                    perimeter += 1;
+                }
+            }
+
+            if *row == height - 1 {
+                perimeter += 1;
+            }
+            else {
+                if plot[(row + 1) * width + col].is_none() {
+                    perimeter += 1;
+                }
+            }
+
+            if *col == 0 {
+                perimeter += 1;
+            }
+            else {
+                if plot[row * width + (col - 1)].is_none() {
+                    perimeter += 1;
+                }
+            }
+
+            if *col == width - 1 {
+                perimeter += 1;
+            }
+            else {
+                if plot[row * width + (col + 1)].is_none() {
+                    perimeter += 1;
+                }
+            }
+        }
+    }
+    perimeter
+}
+
+#[allow(dead_code)]
+pub fn part1() -> String {
+    let mut garden = aoc::to_char("input/day12_example.txt");
+    let mut plots = Vec::<Vec<Option<(usize, usize)>>>::new();
+
+    for row in 0..garden.len() {
+        for col in 0..garden[row].len() {
+            if garden[row][col] == NO_PLANT {
+                continue;
+            }
+
+            let mut plot: Vec<Option<(usize, usize)>> = vec![None; garden.len() * garden[row].len()];
+            find_region((row, col), &mut garden , &mut plot);
+            plots.push(plot);
+        }
+    }
+
+    let mut cost = 0;
+    for plot in plots {
+        let area = plot_area(&plot);
+        let perimeter = plot_perimeter(&plot, garden.len(), garden[0].len());
+
+        cost += area * perimeter;
+        println!("Area: {area}, Perimeter: {perimeter}");
+    }
+
+    cost.to_string()
+}
+
+fn plot_perimeter_cheap(plot: &Vec<Option<(usize, usize)>>, height: usize, width: usize) -> u32 {
+    let mut perimeter_points_left = HashSet::new();
+    let mut perimeter_points_right = HashSet::new();
+    let mut perimeter_points_up = HashSet::new();
+    let mut perimeter_points_down = HashSet::new();
+    for plant in plot {
+        if let Some((row, col)) = plant {
+            if *row == 0 {
+                if !perimeter_points_left.contains(row) {
+                    perimeter_points_left.insert(row);
+                }
+            }
+            else {
+                if plot[(row - 1) * width + col].is_none() {
+                    if !perimeter_points_left.contains(row) {
+                        perimeter_points_left.insert(row);
+                    }
+                }
+            }
+
+            if *row == height - 1 {
+                if !perimeter_points_right.contains(row) {
+                    perimeter_points_right.insert(row);
+                }
+            }
+            else {
+                if plot[(row + 1) * width + col].is_none() {
+                    if !perimeter_points_right.contains(row) {
+                        perimeter_points_right.insert(row);
+                    }
+                }
+            }
+
+            if *col == 0 {
+                if !perimeter_points_up.contains(col) {
+                    perimeter_points_up.insert(col);
+                }
+            }
+            else {
+                if plot[row * width + (col - 1)].is_none() {
+                    if !perimeter_points_up.contains(col) {
+                        perimeter_points_up.insert(col);
+                    }
+                }
+            }
+
+            if *col == width - 1 {
+                if !perimeter_points_down.contains(col) {
+                    perimeter_points_down.insert(col);
+                }
+            }
+            else {
+                if plot[row * width + (col + 1)].is_none() {
+                    if !perimeter_points_down.contains(col) {
+                        perimeter_points_down.insert(col);
+                    }
+                }
+            }
+        }
+    }
+    (perimeter_points_left.len() + perimeter_points_right.len() + perimeter_points_up.len() + perimeter_points_down.len()) as u32
+}
+
+#[allow(dead_code)]
+pub fn part2() -> String {
+    let mut garden = aoc::to_char("input/day12_example.txt");
+    let mut plots = Vec::<Vec<Option<(usize, usize)>>>::new();
+
+    for row in 0..garden.len() {
+        for col in 0..garden[row].len() {
+            if garden[row][col] == NO_PLANT {
+                continue;
+            }
+
+            let mut plot: Vec<Option<(usize, usize)>> = vec![None; garden.len() * garden[row].len()];
+            find_region((row, col), &mut garden , &mut plot);
+            plots.push(plot);
+        }
+    }
+
+    let mut cost = 0;
+    for plot in plots {
+        let area = plot_area(&plot);
+        let perimeter = plot_perimeter_cheap(&plot, garden.len(), garden[0].len());
+
+        cost += area * perimeter;
+        println!("Area: {area}, Perimeter: {perimeter}");
+    }
+
+    cost.to_string()
+}
