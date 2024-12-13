@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 const NO_PLANT: char = '#';
 
 fn find_region(origin: (usize, usize), garden: &mut Vec<Vec<char>>, plot: &mut Vec<Option<(usize, usize)>>) {
@@ -116,7 +115,7 @@ fn find_region_cheap(origin: (usize, usize), garden: &mut Vec<Vec<char>>, plot: 
     }
 }
 
-fn plot_perimeter_cheap(plot: &Vec<(usize, usize)>, height: usize, width: usize) -> u32 {
+fn plot_perimeter_cheap(plot: &Vec<(usize, usize)>) -> u32 {
     let mut edges = 0;
     for plant in plot {
         let go_left = plant.1 - 1;
@@ -163,7 +162,7 @@ fn plot_perimeter_cheap(plot: &Vec<(usize, usize)>, height: usize, width: usize)
 #[allow(dead_code)]
 pub fn part2() -> String {
     let mut garden = aoc::to_char("input/day12.txt");
-    let mut plots = Vec::<(Vec<(usize, usize)>)>::new();
+    let mut plots = Vec::<Vec<(usize, usize)>>::new();
 
     for row in 0..garden.len() {
         for col in 0..garden[row].len() {
@@ -173,14 +172,14 @@ pub fn part2() -> String {
 
             let mut plot = Vec::<(usize, usize)>::new();
             find_region_cheap((row, col), &mut garden , &mut plot);
-            plots.push((plot));
+            plots.push(plot);
         }
     }
 
     let mut cost = 0;
     for plot in plots {
         let area = plot.len() as u32;
-        let perimeter = plot_perimeter_cheap(&plot, garden.len(), garden[0].len());
+        let perimeter = plot_perimeter_cheap(&plot);
 
         cost += area * perimeter;
         println!("Area: {area}, Perimeter: {perimeter}");
