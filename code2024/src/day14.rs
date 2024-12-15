@@ -90,7 +90,7 @@ pub fn part1() -> String {
     safety_factor.to_string()
 }
 
-fn gcd(mut a: i32, mut b: i32) -> i32 {
+/*fn gcd(mut a: i32, mut b: i32) -> i32 {
     while b != 0 {
         let remainder = a % b;
         a = b;
@@ -99,9 +99,9 @@ fn gcd(mut a: i32, mut b: i32) -> i32 {
     a.abs() // Ensure the result is non-negative
 }
 
-fn lcm(mut a: i32, b: i32) -> i32 {
+fn lcm(a: i32, b: i32) -> i32 {
     (a * b).abs() / gcd(a, b)
-}
+}*/
 
 fn map_to_parabola(x: usize, width: usize) -> f64 {
     if width <= 1 {

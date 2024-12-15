@@ -12,6 +12,7 @@ mod day11;
 mod day12;
 mod day13;
 mod day14;
+mod day15;
 
 fn main() {
     // Day 1
@@ -68,5 +69,9 @@ fn main() {
 
     // Day 14
     //println!("Result of day 14, part 1: {}", aoc::benchmark(day14::part1));
-    println!("Result of day 14, part 2: {}", aoc::benchmark(day14::part2));
+    //println!("Result of day 14, part 2: {}", aoc::benchmark(day14::part2));
+
+    // Day 15
+    //println!("Result of day 15, part 1: {}", aoc::benchmark(day15::part1));
+    println!("Result of day 15, part 2: {}", aoc::benchmark(day15::part2));
 }
