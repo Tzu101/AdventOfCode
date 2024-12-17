@@ -126,6 +126,13 @@ pub fn part1() -> String {
     simulate_program(instructions, register)
 }
 
+fn match_hash(a: &str, b: &str) -> usize {
+    a.chars()
+        .zip(b.chars()) // Pair characters from both strings
+        .take_while(|(c1, c2)| c1 == c2) // Stop at the first mismatch
+        .count() // Count matches
+}
+
 #[allow(dead_code)]
 pub fn part2() -> String {
     let mut instructions = Vec::<char>::new();
@@ -143,12 +150,10 @@ pub fn part2() -> String {
         }
     }
 
-    println!("Looking for {:?}", instruction_hash);
-
-    let mut reg_a = 8_u64.pow(instruction_hash.len() as u32 / 2);
+    instruction_hash = instruction_hash.replace(',', "");
+    let mut reg_a = 8_u64.pow(instruction_hash.len() as u32) + 1;
     loop {
-        let new_hash = simulate_program(instructions.clone(), Register { a: reg_a, b: 0, c: 0 });
-        println!("Reg A: {reg_a}, Current len: {}, Required len: {}", new_hash.len(), instruction_hash.len());
+        let new_hash = simulate_program(instructions.clone(), Register { a: reg_a, b: 0, c: 0 }).replace(',', "");;
         if instruction_hash == new_hash {
             break;
         }
