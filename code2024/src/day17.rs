@@ -80,7 +80,7 @@ fn cdv(value: u64, register: &mut Register, _output: &mut Option<String>, _ip: &
     false
 }
 
-fn simulate_program(instructions: Vec<char>, mut register: Register) -> String {
+fn simulate_program(instructions: &Vec<char>, mut register: Register) -> String {
     let mut instruction_pointer = 0;
     let mut output: Option<String> = None;
     let instruction_list = vec![adv, bxl, bst, jnz, bxc, out, bdv, cdv];
@@ -123,14 +123,7 @@ pub fn part1() -> String {
         }
     }
 
-    simulate_program(instructions, register)
-}
-
-fn match_hash(a: &str, b: &str) -> usize {
-    a.chars()
-        .zip(b.chars()) // Pair characters from both strings
-        .take_while(|(c1, c2)| c1 == c2) // Stop at the first mismatch
-        .count() // Count matches
+    simulate_program(&instructions, register)
 }
 
 #[allow(dead_code)]
@@ -151,13 +144,17 @@ pub fn part2() -> String {
     }
 
     instruction_hash = instruction_hash.replace(',', "");
-    let mut reg_a = 8_u64.pow(instruction_hash.len() as u32) + 1;
-    loop {
-        let new_hash = simulate_program(instructions.clone(), Register { a: reg_a, b: 0, c: 0 }).replace(',', "");;
-        if instruction_hash == new_hash {
-            break;
+    let mut reg_a = 0;
+    for pos in (0..instructions.len()).rev() {
+        reg_a <<= 3;
+        loop {
+            let result = simulate_program(&instructions, Register { a: reg_a, b: 0, c: 0 }).replace(',', "");
+            println!("{}  {}", result, instruction_hash[pos..].to_string());
+            if result == instruction_hash[pos..].to_string() {
+                break;
+            }
+            reg_a += 1;
         }
-        reg_a += 1;
     }
 
     reg_a.to_string()
