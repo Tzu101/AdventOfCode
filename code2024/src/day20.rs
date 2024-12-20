@@ -1,20 +1,12 @@
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque, HashSet};
-use crate::day20::State::{CannotCheat, Cheating};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum State {
-    CanCheat,
-    Cheating(usize),
-    CannotCheat
-}
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 struct Point {
     x: usize,
     y: usize,
     score: u64,
-    state: State,
-    id: (usize, usize)
+    cheat: usize
 }
 
 impl Point {
@@ -23,8 +15,7 @@ impl Point {
             x,
             y,
             score: 0,
-            state: State::CanCheat,
-            id: (0, 0)
+            cheat: CHEAT_STEPS,
         }
     }
 
@@ -36,52 +27,7 @@ impl Point {
             x: new_x as usize,
             y: new_y as usize,
             score: point.score + 1,
-            state: State::CanCheat,
-            id: point.id
-        }
-    }
-
-    fn new_cheat(point: &Point) -> Point {
-        Point {
-            x: point.x,
-            y: point.y,
-            score: point.score,
-            state: Cheating(CHEAT_STEPS - 1),
-            id: (point.x, point.y)
-        }
-    }
-
-    fn from_cheat(point: &Point, dx: i64, dy: i64) -> Point {
-        let new_x = point.x as i64 + dx;
-        let new_y = point.y as i64 + dy;
-        if let Cheating(cheat_steps) = point.state {
-            if cheat_steps == 0 {
-                panic!("Cheat steps cannot be 0");
-            }
-
-            Point {
-                x: new_x as usize,
-                y: new_y as usize,
-                score: point.score + 1,
-                state: Cheating(cheat_steps - 1),
-                id: point.id
-            }
-        }
-        else {
-            panic!("Invalid from cheat")
-        }
-    }
-
-    fn from_no_cheat(point: &Point, dx: i64, dy: i64) -> Point {
-        let new_x = point.x as i64 + dx;
-        let new_y = point.y as i64 + dy;
-
-        Point {
-            x: new_x as usize,
-            y: new_y as usize,
-            score: point.score + 1,
-            state: CannotCheat,
-            id: point.id
+            cheat: point.cheat,
         }
     }
 }
@@ -142,62 +88,32 @@ fn find_cheats(start: Point, end: Point, map: &Vec<Vec<char>>, best_non_cheat: u
     let mut path_points = VecDeque::new();
     path_points.push_back(start);
 
-    let mut visited_cheating = vec![vec![[false; CHEAT_STEPS]; map[0].len()]; map.len()];
-    let mut visited_can_cheat = vec![vec![false; map[0].len()]; map.len()];
-    let mut visited_cannot_cheat = vec![vec![HashSet::new(); map[0].len()]; map.len()];
-    let mut unique_scores = HashSet::new();
+    let mut visited = vec![vec![[false; CHEAT_STEPS + 1]; map[0].len()]; map.len()];
     let mut min_cheats = Vec::new();
     while let Some(next_point) = path_points.pop_front() {
-        if next_point.score >= best_non_cheat {
+        if next_point.score > best_non_cheat {
             continue;
         }
         if next_point.x == end.x && next_point.y == end.y {
-            unique_scores.insert(next_point.score);
             min_cheats.push(next_point.score);
-            println!("{:?}, {}", next_point, unique_scores.len());
             continue;
         }
 
-        match next_point.state {
-            State::CanCheat => {
-                let new_cheat = Point::new_cheat(&next_point);
-                path_points.push_back(new_cheat);
-
-                for direction in DIRECTIONS {
-                    let new_point = Point::from(&next_point, direction.0, direction.1);
-                    if point_in_bounds(&new_point, &map) && map[new_point.y][new_point.x] == EMPTY {
-                        if !visited_can_cheat[new_point.y][new_point.x] {
-                            visited_can_cheat[new_point.y][new_point.x] = true;
-                            path_points.push_back(new_point);
-                        }
-                    }
-                }
+        for direction in DIRECTIONS {
+            let mut new_point = Point::from(&next_point, direction.0, direction.1);
+            if !point_in_bounds(&new_point, &map) {
+                continue;
             }
-            State::Cheating(cheat_steps) => {
-                for direction in DIRECTIONS {
-                    let new_point = if cheat_steps == 0 {
-                        Point::from_no_cheat(&next_point, direction.0, direction.1)
-                    }
-                    else {
-                        Point::from_cheat(&next_point, direction.0, direction.1)
-                    };
 
-                    if point_in_bounds(&new_point, &map) && !visited_cheating[new_point.y][new_point.x][cheat_steps] {
-                        visited_cheating[new_point.y][new_point.x][cheat_steps] = true;
-                        path_points.push_back(new_point);
-                    }
-                }
+            let mut add_point = map[new_point.y][new_point.x] == EMPTY;
+            if new_point.cheat > 0 {
+                new_point.cheat -= 1;
+                add_point = true;
             }
-            State::CannotCheat => {
-                for direction in DIRECTIONS {
-                    let new_point = Point::from_no_cheat(&next_point, direction.0, direction.1);
-                    if point_in_bounds(&new_point, &map) && map[new_point.y][new_point.x] == EMPTY {
-                        if !visited_cannot_cheat[new_point.y][new_point.x].contains(&new_point.id) {
-                            visited_cannot_cheat[new_point.y][new_point.x].insert(new_point.id);
-                            path_points.push_back(new_point);
-                        }
-                    }
-                }
+
+            if add_point && !visited[new_point.y][new_point.x][new_point.cheat] {
+                visited[new_point.y][new_point.x][new_point.cheat] = true;
+                path_points.push_back(new_point);
             }
         }
     }
