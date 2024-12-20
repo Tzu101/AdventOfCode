@@ -1,12 +1,13 @@
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, VecDeque, HashSet};
+use std::collections::{BinaryHeap, VecDeque, HashMap, HashSet};
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 struct Point {
     x: usize,
     y: usize,
     score: u64,
-    cheat: usize
+    cheat: usize,
+    cheat_start: Option<(usize, usize)>,
 }
 
 impl Point {
@@ -16,6 +17,7 @@ impl Point {
             y,
             score: 0,
             cheat: CHEAT_STEPS,
+            cheat_start: None
         }
     }
 
@@ -28,6 +30,7 @@ impl Point {
             y: new_y as usize,
             score: point.score + 1,
             cheat: point.cheat,
+            cheat_start: point.cheat_start,
         }
     }
 }
@@ -60,7 +63,7 @@ fn find_path(start: Point, end: Point, map: &Vec<Vec<char>>) -> u64 {
     let mut path_points = BinaryHeap::new();
     path_points.push(start);
 
-    let mut min_scores = vec![vec![9999999999; map[0].len()]; map.len()];
+    let mut min_scores = vec![vec![u64::MAX; map[0].len()]; map.len()];
     while let Some(next_point) = path_points.pop() {
         if next_point.score > min_scores[next_point.y][next_point.x] {
             continue;
@@ -88,15 +91,24 @@ fn find_cheats(start: Point, end: Point, map: &Vec<Vec<char>>, best_non_cheat: u
     let mut path_points = VecDeque::new();
     path_points.push_back(start);
 
-    let mut visited = vec![vec![[false; CHEAT_STEPS + 1]; map[0].len()]; map.len()];
+    let mut temp_map = map.clone();
+
+    let mut visited: HashMap<Option<(usize, usize)>, HashSet<(usize, usize)>> = HashMap::new();
+    visited.insert(None, HashSet::new());
     let mut min_cheats = Vec::new();
     while let Some(next_point) = path_points.pop_front() {
-        if next_point.score > best_non_cheat {
+        if next_point.score >= best_non_cheat {
             continue;
         }
         if next_point.x == end.x && next_point.y == end.y {
             min_cheats.push(next_point.score);
+            temp_map[next_point.cheat_start.unwrap().1][next_point.cheat_start.unwrap().0] = 'X';
+            //println!("Found cheat at {:?}", next_point.cheat_start);
             continue;
+        }
+
+        if next_point.x == 9 && next_point.y == 7 && next_point.cheat_start.is_none() {
+            println!("{:?}", next_point);
         }
 
         for direction in DIRECTIONS {
@@ -105,17 +117,31 @@ fn find_cheats(start: Point, end: Point, map: &Vec<Vec<char>>, best_non_cheat: u
                 continue;
             }
 
-            let mut add_point = map[new_point.y][new_point.x] == EMPTY;
-            if new_point.cheat > 0 {
+            let mut add_point = false;
+            if map[new_point.y][new_point.x] == EMPTY {
+                add_point = true;
+            }
+            else if new_point.cheat > 0 {
+                if new_point.cheat_start.is_none() {
+                    new_point.cheat_start = Some((next_point.x, next_point.y));
+                    visited.insert(Some((next_point.x, next_point.y)), HashSet::new());
+                }
                 new_point.cheat -= 1;
                 add_point = true;
             }
 
-            if add_point && !visited[new_point.y][new_point.x][new_point.cheat] {
-                visited[new_point.y][new_point.x][new_point.cheat] = true;
+            if add_point && !visited.get(&new_point.cheat_start).unwrap().contains(&(new_point.x, new_point.y)) {
+                visited.get_mut(&new_point.cheat_start).unwrap().insert((new_point.x, new_point.y));
                 path_points.push_back(new_point);
             }
         }
+    }
+
+    for row in temp_map {
+        for c in row {
+            print!("{} ", c);
+        }
+        println!();
     }
 
     min_cheats
