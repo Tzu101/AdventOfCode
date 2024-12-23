@@ -81,7 +81,7 @@ fn add_point(map: &Vec<Vec<char>>, path_points: &mut Vec<PathPoint>, visited_poi
 
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let mut map = aoc::to_char("input/day16_example.txt");
+    let mut map = aoc::to_char("input/day16.txt");
     let mut path_points: Vec<PathPoint> = Vec::new();
     let mut end_point: PathPoint = PathPoint {x: 0, y: 0, score: 0, direction: Direction::None, path: vec![]};
     for row in 0..map.len() {

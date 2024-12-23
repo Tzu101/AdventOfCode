@@ -69,7 +69,7 @@ fn plot_perimeter(plot: &Vec<Option<(usize, usize)>>, height: usize, width: usiz
 
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let mut garden = aoc::to_char("input/day12_example.txt");
+    let mut garden = aoc::to_char("input/day12.txt");
     let mut plots = Vec::<Vec<Option<(usize, usize)>>>::new();
 
     for row in 0..garden.len() {

@@ -4,7 +4,7 @@ fn is_position_in_map(row: i32, col: i32, map: &Vec<Vec<char>>) -> bool {
 
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let antenna_map = aoc::to_char("input/day8_example.txt");
+    let antenna_map = aoc::to_char("input/day8.txt");
     let mut anti_antenna_map = antenna_map.clone();
 
     for row in 0..antenna_map.len() {

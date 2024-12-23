@@ -103,7 +103,7 @@ pub fn part1() -> String {
     let mut register = Register { a: 0, b: 0, c: 0 };
     let mut instructions = Vec::<char>::new();
 
-    let input = aoc::to_string("input/day17_example.txt");
+    let input = aoc::to_string("input/day17.txt");
     let input = input.split("\n").collect::<Vec<&str>>();
     for i in 0..input.len() {
         match i {

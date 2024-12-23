@@ -27,7 +27,7 @@ fn move_object(map: &mut Vec<Vec<char>>, pos_x: usize, pos_y: usize, move_x: i32
 
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let input = aoc::to_char("input/day15_example.txt");
+    let input = aoc::to_char("input/day15.txt");
 
     let mut pos_x = 0;
     let mut pos_y = 0;

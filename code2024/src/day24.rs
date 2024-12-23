@@ -1,6 +1,6 @@
 #[allow(dead_code)]
 pub fn part1() -> String {
-    let input = aoc::to_lines("input/day24_example.txt");
+    let input = aoc::to_lines("input/day24.txt");
     1.to_string()
 }
 

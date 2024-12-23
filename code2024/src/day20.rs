@@ -49,7 +49,7 @@ impl PartialOrd for Point {
 const EMPTY: char = '.';
 const START: char = 'S';
 const END: char = 'E';
-const INPUT: &str = "input/day20_example.txt";
+const INPUT: &str = "input/day20.txt";
 
 const DIRECTIONS: [(i64, i64); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
 const CHEAT_STEPS: usize = 1;
