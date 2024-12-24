@@ -117,6 +117,6 @@ fn main() {
     //println!("Result of day 23, part 2: {}", aoc::benchmark(day23::part2));
 
     // Day 24
-    println!("Result of day 24, part 1: {}", aoc::benchmark(day24::part1));
-    //println!("Result of day 24, part 2: {}", aoc::benchmark(day24::part2));
+    //println!("Result of day 24, part 1: {}", aoc::benchmark(day24::part1));
+    println!("Result of day 24, part 2: {}", aoc::benchmark(day24::part2));
 }
